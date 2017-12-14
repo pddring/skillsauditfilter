@@ -26,6 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->libdir/gradelib.php");
+require_once("$CFG->dirroot/mod/skillsaudit/locallib.php");
 
 class filter_skillsaudit extends moodle_text_filter {
 
@@ -72,53 +73,5 @@ class filter_skillsaudit extends moodle_text_filter {
  */
 function filter_skillsaudit_callback($text) {
 	global $COURSE, $USER;
-	$table = new html_table();
-	$table->attributes['class'] = 'generaltable mod_index';
-	
-	$strname = get_string('modulenameplural', 'mod_skillsaudit');
-	$table->align = array ('center', 'left', 'center', 'center', 'center');
-	
-
-	$modinfo = get_fast_modinfo($COURSE);
-	
-	$strongest = array('row'=>array(), 'total'=>0);
-	$weakest = array('row'=>array(), 'total'=>100);
-	
-	foreach ($modinfo->instances['skillsaudit'] as $cm) {
-		$row = array();	
-		$class = $cm->visible ? null : array('class' => 'dimmed');
-	
-		$row[] = html_writer::link(new moodle_url('/mod/skillsaudit/view.php', array('id' => $cm->id)),
-					'<img src="' . $cm->get_icon_url() . '"> ' . $cm->get_formatted_name(), $class);
-					
-		$grading_info = grade_get_grades($COURSE->id, 'mod', 'skillsaudit', $cm->instance, array($USER->id));
- 
-		$grade_item_grademax = $grading_info->items[0]->grademax;
-		$confidence = intval($grading_info->items[0]->grades[$USER->id]->grade);
-		$coverage = intval($grading_info->items[2]->grades[$USER->id]->grade);
-		$total = $coverage * $confidence / 100;
-		
-		$row[] = filter_skillsaudit::get_rating_bar($coverage, 'Coverage');
-		$row[] = filter_skillsaudit::get_rating_bar($confidence, 'Confidence');
-		
-		if($total > $strongest['total']) {
-			$strongest['total'] = $total;
-			array_unshift($row, '<h3>Your strongest area:</h3> ');
-			$strongest['row'] = $row;
-		}
-		
-		if($total < $weakest['total']) {
-			$weakest['total'] = $total;
-			array_unshift($row, '<h3>Suggested target:</h3> ');
-			$weakest['row'] = $row;
-		}
-	}
-	
-	$table->data[] = $strongest['row'];
-	$table->data[] = $weakest['row'];
-	/*$coverage = 0;
-	$confidence = 0;
-	$table->data[] = array('<h3>Total</h3>', '', filter_skillsaudit::get_rating_bar($coverage, 'Coverage'), filter_skillsaudit::get_rating_bar($coverage, 'Coverage'));*/
-	
-	return html_writer::table($table);
+	return skillsaudit_get_user_summary($COURSE, $USER);
 }
