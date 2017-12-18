@@ -52,16 +52,6 @@ class filter_skillsaudit extends moodle_text_filter {
         return $text;
     }
 	
-	public static function get_rating_bar($percentage, $label) {
-		/*$background = 'linear-gradient(to right,red,hsl(' . round($percentage * 120.0 / 100.0) .',100%,50%))';
-		return '<span class="conf_ind_cont" title="' . $percentage . '"><span class="conf_ind" style="width:' . $percentage . '%; background: ' . $background . '"></span>';*/
-		
-		$h = 120 * $percentage / 100;
-		$d = 180 - (180 * $percentage / 100);
-		$style = 'background-color: hsl(' . $h . ',100%,50%);transform:rotate(' . $d . 'deg)';
-		$html = '<span class="wrist"><span class="thumb" style="' . $style . '"></span></span><p>' . $label . ' <span class="summary_value">' . $percentage . '%</span></p>';
-		return $html;
-	}
 
 }
 /**
